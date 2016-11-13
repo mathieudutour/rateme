@@ -100,8 +100,8 @@ class State {
                     // use info.firstName and info.lastName however you need
                     self.currentUser?["lastSeen"] = NSDate()
                     self.currentUser?["username"] = ((info!.nameComponents?.givenName)! + " " + (info!.nameComponents?.familyName)!) as CKRecordValue?
-                    self.currentUser?["score"] = 2.5 as CKRecordValue?
-                    self.currentUser?["rating"] = 0 as CKRecordValue?
+                    self.currentUser?["score"] = 0.5 as CKRecordValue?
+                    self.currentUser?["ratings"] = 0 as CKRecordValue?
                     self.currentUser?["avatar"] = CKAsset(fileURL: avatar as URL)
                     
                     let operation = CKModifyRecordsOperation(recordsToSave: [self.currentUser!], recordIDsToDelete: nil)
@@ -120,6 +120,49 @@ class State {
                 }
             }
         }
+    }
+    
+    func rate(iCloudId: String, rating: NSInteger) {
+        let rater = self.recordId!.recordName
+        let ratee = iCloudId
+        let query = CKQuery(
+            recordType: "Rating",
+            predicate: NSPredicate(format: "rater == %@ AND ratee == %@ AND createdAt > %@", rater, ratee, NSDate().timeIntervalSince1970 - 24 * 60 * 60)
+        )
+        
+        self.publicDB.perform(query, inZoneWith: nil) { (last24hRatings, error) in
+            if (last24hRatings != nil && (last24hRatings?.count)! > 0) {
+                print("already rated")
+                return
+            }
+            self.publicDB.fetch(withRecordID: CKRecordID(recordName: iCloudId)) { fetchedUser, error in
+                let ratingRecord = CKRecord(recordType: "Rating")
+                ratingRecord["rating"] = (Double(rating) / 5.0) as CKRecordValue?
+                ratingRecord["rater"] = rater as CKRecordValue?
+                ratingRecord["ratee"] = ratee as CKRecordValue?
+                ratingRecord["createdAt"] = NSDate().timeIntervalSince1970 as CKRecordValue?
+                
+                if (fetchedUser?["ratings"] == nil) {
+                    fetchedUser?["ratings"] = 0 as CKRecordValue?
+                }
+                if (fetchedUser?["score"] == nil) {
+                    fetchedUser?["score"] = 0.5 as CKRecordValue?
+                }
+                
+                let weight = exp(((self.currentUser?["score"] as! Double) - (fetchedUser?["score"] as! Double)) * 5) / 1000
+                fetchedUser?["score"] = (self.currentUser?["score"] as! Double) * (1 - weight) + (Double(rating) / 5.0 * weight) as CKRecordValue?
+                fetchedUser?["ratings"] = fetchedUser?["ratings"] as! Int + 1 as CKRecordValue?
+                
+                let operations = CKModifyRecordsOperation(recordsToSave: [ratingRecord, fetchedUser!], recordIDsToDelete: nil)
+                
+                operations.completionBlock = {
+                    self.dispatch()
+                }
+                
+                self.publicDB.add(operations)
+            }
+        }
+
     }
     
     
