@@ -6,4 +6,12 @@
 //  Copyright © 2016 Mathieu Dutour. All rights reserved.
 //
 
-import Foundation
+import UIKit
+
+class LoadingViewController: UIViewController {
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+
+}
