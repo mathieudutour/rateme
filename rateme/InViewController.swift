@@ -8,14 +8,15 @@
 
 import UIKit
 
-class InViewController: UIViewController, Subscriber {
+class InViewController: UIViewController, Subscriber, UITableViewDelegate, UITableViewDataSource {
     var identifier = generateIdentifier()
-    var discovery: Discovery?
-    var users: NSArray?
+    var users: [BLEUser] = []
 
-    @IBOutlet weak var score: UILabel!
+    @IBOutlet weak var usersTableView: UITableView!
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.usersTableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         State.sharedInstance.subscribe(listener: self)
     }
     
@@ -24,7 +25,27 @@ class InViewController: UIViewController, Subscriber {
     }
     
     func update(state: State) {
-        score.text = "\(state.currentUser!["score"])"
+        self.users = state.closeUsers.filter({user in
+            return user.record != nil
+        })
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.users.count;
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = self.usersTableView.dequeueReusableCell(withIdentifier: "cell")! as UITableViewCell
+        
+        let record = self.users[indexPath.row].record!
+        
+        cell.textLabel?.text = record["username"] as! String?
+        
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
     }
     
 }

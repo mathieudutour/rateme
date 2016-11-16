@@ -10,8 +10,7 @@ import UIKit
 import CloudKit
 
 // Listeners are updatable and have an identity so they can be compared
-protocol Subscriber
-{
+protocol Subscriber {
     func update(state : State)
     var identifier : String { get set }
 }
@@ -20,6 +19,8 @@ protocol Subscriber
 func generateIdentifier() -> String {
     return NSUUID().uuidString
 }
+
+let RATING = "Rating"
 
 class State {
     static let sharedInstance : State = {
@@ -40,6 +41,7 @@ class State {
 
     
     init() {
+        let container = CKContainer.default()
         iCloudUserIDAsync() {
             recordID, error in
             if let userID = recordID?.recordName {
@@ -53,11 +55,39 @@ class State {
                     }
                     
                     if (fetchedUser?["username"] == nil) {
-                        print("no user")
-                        self.loading = false
-                        self.loggedin = false
-                        self.currentUser = fetchedUser
-                        self.dispatch()
+                        // signup
+                        container.requestApplicationPermission(CKApplicationPermissions.userDiscoverability) { (status, error) in
+                            guard error == nil else { return }
+                            
+                            if status == CKApplicationPermissionStatus.granted {
+                                container.discoverUserIdentity(withUserRecordID: self.recordId!) { (info, fetchError) in
+                                    // use info.firstName and info.lastName however you need
+                                    fetchedUser?["lastSeen"] = NSDate()
+                                    fetchedUser?["username"] = ((info!.nameComponents?.givenName)! + " " + (info!.nameComponents?.familyName)!) as CKRecordValue?
+                                    fetchedUser?["score"] = 0.5 as CKRecordValue?
+                                    fetchedUser?["ratings"] = 0 as CKRecordValue?
+//                                    self.currentUser?["avatar"] = CKAsset(fileURL: avatar as URL)
+                                    self.currentUser = fetchedUser
+                                    
+                                    let operation = CKModifyRecordsOperation(recordsToSave: [self.currentUser!], recordIDsToDelete: nil)
+                                    
+                                    operation.perRecordProgressBlock = { record, progress in
+                                        print("progress")
+                                    }
+                                    
+                                    operation.completionBlock = {
+                                        self.loading = true
+                                        self.loggedin = true
+                                        self.listenToRatings()
+                                        self.startDiscovery()
+                                        self.dispatch()
+                                    }
+                                    
+                                    self.publicDB.add(operation)
+                                }
+                            }
+                        }
+
                         return
                     }
                     
@@ -67,10 +97,11 @@ class State {
                     self.loggedin = true
                     self.currentUser = fetchedUser
                     print(self.currentUser!)
+                    self.listenToRatings()
                     self.startDiscovery()
                     self.dispatch()
                     
-                    CKContainer.default().discoverUserIdentity(withUserRecordID: self.recordId!) { (info, fetchError) in
+                    container.discoverUserIdentity(withUserRecordID: self.recordId!) { (info, fetchError) in
                         let username = ((info!.nameComponents?.givenName)! + " " + (info!.nameComponents?.familyName)!)
                         if (username != self.currentUser?["username"] as! String) {
                             self.currentUser?["username"] = username as CKRecordValue?
@@ -89,44 +120,12 @@ class State {
         }
     }
     
-    func signup(avatar: URL) {
-        let container = CKContainer.default()
-        
-        container.requestApplicationPermission(CKApplicationPermissions.userDiscoverability) { (status, error) in
-            guard error == nil else { return }
-            
-            if status == CKApplicationPermissionStatus.granted {
-                container.discoverUserIdentity(withUserRecordID: self.recordId!) { (info, fetchError) in
-                    // use info.firstName and info.lastName however you need
-                    self.currentUser?["lastSeen"] = NSDate()
-                    self.currentUser?["username"] = ((info!.nameComponents?.givenName)! + " " + (info!.nameComponents?.familyName)!) as CKRecordValue?
-                    self.currentUser?["score"] = 0.5 as CKRecordValue?
-                    self.currentUser?["ratings"] = 0 as CKRecordValue?
-                    self.currentUser?["avatar"] = CKAsset(fileURL: avatar as URL)
-                    
-                    let operation = CKModifyRecordsOperation(recordsToSave: [self.currentUser!], recordIDsToDelete: nil)
-                    
-                    operation.perRecordProgressBlock = { record, progress in
-                        print("progress")
-                    }
-                    
-                    operation.completionBlock = {
-                        self.loggedin = true
-                        self.startDiscovery()
-                        self.dispatch()
-                    }
-                    
-                    self.publicDB.add(operation)
-                }
-            }
-        }
-    }
     
     func rate(iCloudId: String, rating: NSInteger) {
         let rater = self.recordId!.recordName
         let ratee = iCloudId
         let query = CKQuery(
-            recordType: "Rating",
+            recordType: RATING,
             predicate: NSPredicate(format: "rater == %@ AND ratee == %@ AND createdAt > %@", rater, ratee, NSDate().timeIntervalSince1970 - 24 * 60 * 60)
         )
         
@@ -137,7 +136,7 @@ class State {
             }
             self.publicDB.fetch(withRecordID: CKRecordID(recordName: iCloudId)) { fetchedUser, error in
                 let ratingRecord = CKRecord(recordType: "Rating")
-                ratingRecord["rating"] = (Double(rating) / 5.0) as CKRecordValue?
+                ratingRecord["rating"] = (Double(rating - 1) / 4.0) as CKRecordValue?
                 ratingRecord["rater"] = rater as CKRecordValue?
                 ratingRecord["ratee"] = ratee as CKRecordValue?
                 ratingRecord["createdAt"] = NSDate().timeIntervalSince1970 as CKRecordValue?
@@ -168,7 +167,7 @@ class State {
     
     
     
-    func startDiscovery() {
+    private func startDiscovery() {
         // start Discovery
         self.discovery = Discovery.init(icloudID: (self.recordId?.recordName)!, usersBlock: {users, usersChanged in
             print("Discovering users: %lu", users.count)
@@ -214,7 +213,7 @@ class State {
         })
     }
 
-    func dispatch() {
+    private func dispatch() {
         self.subscribers.forEach { $0.update(state: self) }
     }
     
@@ -228,7 +227,7 @@ class State {
     }
     
     /// async gets iCloud record name of logged-in user
-    func iCloudUserIDAsync(complete: @escaping (_ instance: CKRecordID?, _ error: NSError?) -> ()) {
+    private func iCloudUserIDAsync(complete: @escaping (_ instance: CKRecordID?, _ error: NSError?) -> ()) {
         CKContainer.default().fetchUserRecordID() {
             recordID, error in
             if error != nil {
@@ -239,5 +238,22 @@ class State {
                 complete(recordID, nil)
             }
         }
+    }
+    
+    private func listenToRatings() {
+        let subscription = CKQuerySubscription(
+            recordType: RATING,
+            predicate: NSPredicate(format: "ratee == %@", self.recordId!.recordName),
+            options: .firesOnRecordCreation
+        )
+        
+        let info = CKNotificationInfo()
+        
+        info.alertBody = "Someone just rated you!"
+        info.shouldBadge = true
+
+        subscription.notificationInfo = info
+        
+        publicDB.save(subscription) { record, error in }
     }
 }
