@@ -27,7 +27,7 @@ class State: NSObject {
     var recordId: CKRecordID?
     var currentUser: CKRecord?
     var closeUsers: [BLEUser] = []
-    
+
     func deepCopy() -> State {
         let stateCopy = State()
         stateCopy.loading = self.loading
@@ -47,16 +47,15 @@ class Redux {
         let instance = Redux()
         return instance
     }()
-    
+
     var subscribers: Array<Subscriber> = []
     var discovery: Discovery?
-    
+
     let publicDB = CKContainer.default().publicCloudDatabase
-    
+
     var previousState = State()
     var state = State()
 
-    
     init() {
         let container = CKContainer.default()
         iCloudUserIDAsync() {
@@ -71,12 +70,12 @@ class Redux {
                         self.dispatch()
                         return
                     }
-                    
+
                     if fetchedUser?["username"] == nil {
                         // signup
                         container.requestApplicationPermission(CKApplicationPermissions.userDiscoverability) { (status, error) in
                             guard error == nil else { return }
-                            
+
                             if status == CKApplicationPermissionStatus.granted {
                                 container.discoverUserIdentity(withUserRecordID: self.state.recordId!) { (info, fetchError) in
                                     // use info.firstName and info.lastName however you need
@@ -86,13 +85,13 @@ class Redux {
                                     fetchedUser?["ratings"] = 0 as CKRecordValue?
 //                                    self.currentUser?["avatar"] = CKAsset(fileURL: avatar as URL)
                                     self.state.currentUser = fetchedUser
-                                    
+
                                     let operation = CKModifyRecordsOperation(recordsToSave: [self.state.currentUser!], recordIDsToDelete: nil)
-                                    
+
                                     operation.perRecordProgressBlock = { record, progress in
                                         print("progress")
                                     }
-                                    
+
                                     operation.completionBlock = {
                                         self.state.loading = true
                                         self.state.loggedin = true
@@ -100,7 +99,7 @@ class Redux {
                                         self.startDiscovery()
                                         self.dispatch()
                                     }
-                                    
+
                                     self.publicDB.add(operation)
                                 }
                             }
@@ -108,9 +107,9 @@ class Redux {
 
                         return
                     }
-                    
+
                     fetchedUser?["lastSeen"] = NSDate()
-                    
+
                     self.state.loading = false
                     self.state.loggedin = true
                     self.state.currentUser = fetchedUser
@@ -118,10 +117,10 @@ class Redux {
                     self.listenToRatings()
                     self.startDiscovery()
                     self.dispatch()
-                    
+
                     container.requestApplicationPermission(CKApplicationPermissions.userDiscoverability) { (status, error) in
                         guard error == nil else { return }
-                        
+
                         if status == CKApplicationPermissionStatus.granted {
                             container.discoverUserIdentity(withUserRecordID: self.state.recordId!) { (info, fetchError) in
                                 let username = ((info!.nameComponents?.givenName)! + " " + (info!.nameComponents?.familyName)!)
@@ -130,7 +129,7 @@ class Redux {
                                     self.dispatch()
                                 }
                                 self.publicDB.save(self.state.currentUser!) { savedUser, savedError in
-                        
+
                                 }
                             }
                         }
@@ -143,8 +142,7 @@ class Redux {
             }
         }
     }
-    
-    
+
     func rate(iCloudId: String, rating: NSInteger) {
         let rater = CKReference.init(recordID: self.state.recordId!, action: CKReferenceAction.deleteSelf)
         let ratee = CKReference.init(recordID: CKRecordID(recordName: iCloudId), action: CKReferenceAction.deleteSelf)
@@ -152,7 +150,7 @@ class Redux {
             recordType: RATING,
             predicate: NSPredicate(format: "rater == %@ AND ratee == %@ AND creationDate > %@", rater, ratee, NSDate().addingTimeInterval(-24 * 60 * 60))
         )
-        
+
         self.publicDB.perform(query, inZoneWith: nil) { (last24hRatings, error) in
             if (last24hRatings != nil && (last24hRatings?.count)! > 0) {
                 print("already rated")
@@ -164,30 +162,30 @@ class Redux {
                 ratingRecord["rater"] = rater
                 ratingRecord["ratee"] = ratee
                 ratingRecord["createdAt"] = NSDate().timeIntervalSince1970 as CKRecordValue?
-                
+
                 if fetchedUser?["ratings"] == nil {
                     fetchedUser?["ratings"] = 0 as CKRecordValue?
                 }
                 if fetchedUser?["score"] == nil {
                     fetchedUser?["score"] = 0.5 as CKRecordValue?
                 }
-                
+
                 let weight = exp(((self.state.currentUser?["score"] as! Double) - (fetchedUser?["score"] as! Double)) * 5) / 1000
                 fetchedUser?["score"] = (self.state.currentUser?["score"] as! Double) * (1 - weight) + (Double(rating) / 5.0 * weight) as CKRecordValue?
                 fetchedUser?["ratings"] = fetchedUser?["ratings"] as! Int + 1 as CKRecordValue?
-                
+
                 let operations = CKModifyRecordsOperation(recordsToSave: [ratingRecord, fetchedUser!], recordIDsToDelete: nil)
-                
+
                 operations.completionBlock = {
                     self.dispatch()
                 }
-                
+
                 self.publicDB.add(operations)
             }
         }
 
     }
-    
+
     private func startDiscovery() {
         // start Discovery
         self.discovery = Discovery.init(icloudID: (self.state.recordId?.recordName)!, usersBlock: {users, usersChanged in
@@ -214,7 +212,7 @@ class Redux {
                         return CKRecordID(recordName: user.iCloudID!)
                     }))
                 )
-                
+
                 self.publicDB.perform(query, inZoneWith: nil) { (records, error) in
                     for record in records! {
                         let index = self.state.closeUsers.index(where: {closeUser in
@@ -238,16 +236,16 @@ class Redux {
         self.subscribers.forEach { $0.update(state: self.state, previousState: self.previousState) }
         self.previousState = self.state.deepCopy()
     }
-    
+
     func subscribe(listener: Subscriber) {
         self.subscribers.append(listener)
         listener.update(state: self.state, previousState: self.previousState)
     }
-    
+
     func unsubscribe(listener: Subscriber ) {
         self.subscribers = self.subscribers.filter({ $0.identifier != listener.identifier })
     }
-    
+
     /// async gets iCloud record name of logged-in user
     private func iCloudUserIDAsync(complete: @escaping (_ instance: CKRecordID?, _ error: NSError?) -> ()) {
         CKContainer.default().fetchUserRecordID() {
@@ -261,21 +259,21 @@ class Redux {
             }
         }
     }
-    
+
     private func listenToRatings() {
         let subscription = CKQuerySubscription(
             recordType: RATING,
             predicate: NSPredicate(format: "ratee == %@", self.state.recordId!.recordName),
             options: .firesOnRecordCreation
         )
-        
+
         let info = CKNotificationInfo()
-        
+
         info.alertBody = "Someone just rated you!"
         info.shouldBadge = true
 
         subscription.notificationInfo = info
-        
+
         publicDB.save(subscription) { record, error in }
     }
 }

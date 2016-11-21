@@ -19,7 +19,7 @@ class CloseUserCell: UITableViewCell {
             setUsernameAndScore()
         }
     }
-    
+
     func setUsernameAndScore() {
         if username != nil {
             if user != nil {

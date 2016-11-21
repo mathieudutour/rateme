@@ -1,0 +1,7 @@
+force_cast: warning # implicitly
+function_body_length: warning # implicitly
+type_name:
+  min_length: 4 # only warning
+  max_length: # warning and error
+    warning: 1000
+    error: 1000

@@ -16,11 +16,11 @@ class RootController: UINavigationController, Subscriber {
         self.setNavigationBarHidden(true, animated: false)
         Redux.sharedInstance.subscribe(listener: self)
     }
-    
+
     deinit {
         Redux.sharedInstance.unsubscribe(listener: self)
     }
-    
+
     func update(state: State, previousState: State) {
         DispatchQueue.main.async {
             let storyboard = UIStoryboard.init(name: "Main", bundle: nil)

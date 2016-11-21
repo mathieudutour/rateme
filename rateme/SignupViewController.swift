@@ -10,7 +10,7 @@ import UIKit
 import CloudKit
 
 class SignupViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    
+
     @IBOutlet weak var avatarImageView: UIImageView!
     var avatarURL: NSURL?
     let imagePicker = UIImagePickerController()
@@ -21,30 +21,30 @@ class SignupViewController: UIViewController, UIImagePickerControllerDelegate, U
         avatarImageView.layer.cornerRadius = avatarImageView.frame.height/2
         avatarImageView.clipsToBounds = true
     }
-    
+
     @IBAction func loadAvatar(_ sender: Any) {
         let actionSheet = UIAlertController(title: "Choose option", message: "Option to select", preferredStyle: .actionSheet)
-        
+
         let cancelActionButton: UIAlertAction = UIAlertAction(title: "Cancel", style: .cancel) { action -> Void in
             print("Cancel")
         }
         actionSheet.addAction(cancelActionButton)
-        
+
         let cameraActionButton: UIAlertAction = UIAlertAction(title: "Camera", style: .default) { action -> Void in
             self.imagePicker.sourceType = .camera
             self.present(self.imagePicker, animated: true, completion: nil)
         }
         actionSheet.addAction(cameraActionButton)
-        
+
         let galleryActionButton: UIAlertAction = UIAlertAction(title: "Photo Library", style: .default) { action -> Void in
             self.imagePicker.sourceType = .photoLibrary
             self.present(self.imagePicker, animated: true, completion: nil)
         }
         actionSheet.addAction(galleryActionButton)
-        
+
         self.present(actionSheet, animated: true, completion: nil)
     }
-    
+
     func resizeImage(image: UIImage, newSize: CGFloat) -> UIImage {
         let scale = newSize / (image.size.width > image.size.height ? image.size.height : image.size.width)
         let newHeight = image.size.height * scale
@@ -54,10 +54,10 @@ class SignupViewController: UIViewController, UIImagePickerControllerDelegate, U
         image.draw(in: CGRect(origin: CGPoint(x: 0, y: 0), size: newSize))
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        
+
         return newImage!
     }
-    
+
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         picker.dismiss(animated: true, completion: nil)
         let image = info[UIImagePickerControllerOriginalImage]
@@ -65,7 +65,7 @@ class SignupViewController: UIViewController, UIImagePickerControllerDelegate, U
             let imageURL = info[UIImagePickerControllerReferenceURL] as! NSURL
             let imagePath =  imageURL.path!
             let localPath = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(imagePath)
-            
+
             let path = localPath?.relativePath
             let resizedImage = resizeImage(image: image as! UIImage, newSize: 200)
             let data = UIImagePNGRepresentation(resizedImage)

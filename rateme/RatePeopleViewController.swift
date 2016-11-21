@@ -18,19 +18,19 @@ class RatePeopleViewController: UIViewController, UIGestureRecognizerDelegate {
 
     var swooshSound = NSURL(fileURLWithPath: Bundle.main.path(forResource: "swoosh", ofType: "mp3")!)
     var audioPlayer = AVAudioPlayer()
-    
+
     @IBOutlet weak var username: UILabel!
     @IBOutlet weak var starRating: StarRating!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-        
+
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: swooshSound as URL)
         } catch {
-            
+
         }
         audioPlayer.prepareToPlay()
     }

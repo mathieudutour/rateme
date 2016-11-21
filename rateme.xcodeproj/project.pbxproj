@@ -239,7 +239,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0308A4321DD6287F00D74A1D /* Build configuration list for PBXNativeTarget "rateme" */;
 			buildPhases = (
-				03AE5B251DE3593E00B64A76 /* Lint */,
 				0308A4031DD6287E00D74A1D /* Sources */,
 				0308A4041DD6287E00D74A1D /* Frameworks */,
 				0308A4051DD6287E00D74A1D /* Resources */,
@@ -389,20 +388,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		03AE5B251DE3593E00B64A76 /* Lint */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = Lint;
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
-		};
 		3AE18EF45C13D76FC0E085F0 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
