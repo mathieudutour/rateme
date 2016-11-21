@@ -23,6 +23,21 @@
 		032003341DD73CD1006B536C /* InViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032003331DD73CD1006B536C /* InViewController.swift */; };
 		032003381DD79F5C006B536C /* Discovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032003371DD79F5C006B536C /* Discovery.swift */; };
 		0320033A1DD7A881006B536C /* BLEUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032003391DD7A881006B536C /* BLEUser.swift */; };
+		03A9404F1DDE53F3002B0034 /* CloseUserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A9404E1DDE53F3002B0034 /* CloseUserCell.swift */; };
+		03A940511DE069AA002B0034 /* WaveHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A940501DE069AA002B0034 /* WaveHeader.swift */; };
+		03A940531DE220C1002B0034 /* RatePeopleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A940521DE220C1002B0034 /* RatePeopleViewController.swift */; };
+		03A940551DE22240002B0034 /* StarRating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A940541DE22240002B0034 /* StarRating.swift */; };
+		03A940571DE22D1F002B0034 /* AnimatedBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A940561DE22D1F002B0034 /* AnimatedBackground.swift */; };
+		03AE5B0F1DE2599600B64A76 /* StarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AE5B0E1DE2599600B64A76 /* StarButton.swift */; };
+		03AE5B111DE25CE300B64A76 /* star.png in Resources */ = {isa = PBXBuildFile; fileRef = 03AE5B101DE25CE300B64A76 /* star.png */; };
+		03AE5B1D1DE3347700B64A76 /* rate.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 03AE5B151DE3347700B64A76 /* rate.mp3 */; };
+		03AE5B1E1DE3347700B64A76 /* send.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 03AE5B161DE3347700B64A76 /* send.mp3 */; };
+		03AE5B1F1DE3347700B64A76 /* star1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 03AE5B171DE3347700B64A76 /* star1.mp3 */; };
+		03AE5B201DE3347700B64A76 /* star2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 03AE5B181DE3347700B64A76 /* star2.mp3 */; };
+		03AE5B211DE3347700B64A76 /* star3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 03AE5B191DE3347700B64A76 /* star3.mp3 */; };
+		03AE5B221DE3347700B64A76 /* star4.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 03AE5B1A1DE3347700B64A76 /* star4.mp3 */; };
+		03AE5B231DE3347700B64A76 /* star5.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 03AE5B1B1DE3347700B64A76 /* star5.mp3 */; };
+		03AE5B241DE3347700B64A76 /* swoosh.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 03AE5B1C1DE3347700B64A76 /* swoosh.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +81,21 @@
 		032003331DD73CD1006B536C /* InViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InViewController.swift; sourceTree = "<group>"; };
 		032003371DD79F5C006B536C /* Discovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Discovery.swift; sourceTree = "<group>"; };
 		032003391DD7A881006B536C /* BLEUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEUser.swift; sourceTree = "<group>"; };
+		03A9404E1DDE53F3002B0034 /* CloseUserCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloseUserCell.swift; sourceTree = "<group>"; };
+		03A940501DE069AA002B0034 /* WaveHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaveHeader.swift; sourceTree = "<group>"; };
+		03A940521DE220C1002B0034 /* RatePeopleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatePeopleViewController.swift; sourceTree = "<group>"; };
+		03A940541DE22240002B0034 /* StarRating.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarRating.swift; sourceTree = "<group>"; };
+		03A940561DE22D1F002B0034 /* AnimatedBackground.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimatedBackground.swift; sourceTree = "<group>"; };
+		03AE5B0E1DE2599600B64A76 /* StarButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarButton.swift; sourceTree = "<group>"; };
+		03AE5B101DE25CE300B64A76 /* star.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = star.png; sourceTree = "<group>"; };
+		03AE5B151DE3347700B64A76 /* rate.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = rate.mp3; sourceTree = "<group>"; };
+		03AE5B161DE3347700B64A76 /* send.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = send.mp3; sourceTree = "<group>"; };
+		03AE5B171DE3347700B64A76 /* star1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = star1.mp3; sourceTree = "<group>"; };
+		03AE5B181DE3347700B64A76 /* star2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = star2.mp3; sourceTree = "<group>"; };
+		03AE5B191DE3347700B64A76 /* star3.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = star3.mp3; sourceTree = "<group>"; };
+		03AE5B1A1DE3347700B64A76 /* star4.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = star4.mp3; sourceTree = "<group>"; };
+		03AE5B1B1DE3347700B64A76 /* star5.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = star5.mp3; sourceTree = "<group>"; };
+		03AE5B1C1DE3347700B64A76 /* swoosh.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = swoosh.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,13 +148,16 @@
 		0308A4091DD6287E00D74A1D /* rateme */ = {
 			isa = PBXGroup;
 			children = (
+				03A9404D1DDE53D1002B0034 /* components */,
 				032003251DD657EF006B536C /* rateme.entitlements */,
 				0308A40A1DD6287E00D74A1D /* AppDelegate.swift */,
 				032003281DD664EC006B536C /* State.swift */,
+				03AE5B141DE3346800B64A76 /* sounds */,
 				032003391DD7A881006B536C /* BLEUser.swift */,
 				032003371DD79F5C006B536C /* Discovery.swift */,
 				036619FD1DD8DDBA00038FEF /* views */,
 				0308A4141DD6287E00D74A1D /* Assets.xcassets */,
+				03AE5B101DE25CE300B64A76 /* star.png */,
 				0308A4161DD6287E00D74A1D /* LaunchScreen.storyboard */,
 				0308A4191DD6287E00D74A1D /* Info.plist */,
 				0308A4111DD6287E00D74A1D /* rateme.xcdatamodeld */,
@@ -159,8 +192,36 @@
 				032003301DD73CB5006B536C /* SignupViewController.swift */,
 				0320032C1DD73802006B536C /* LoadingViewController.swift */,
 				0308A40C1DD6287E00D74A1D /* RootController.swift */,
+				03A940521DE220C1002B0034 /* RatePeopleViewController.swift */,
 			);
 			name = views;
+			sourceTree = "<group>";
+		};
+		03A9404D1DDE53D1002B0034 /* components */ = {
+			isa = PBXGroup;
+			children = (
+				03A9404E1DDE53F3002B0034 /* CloseUserCell.swift */,
+				03A940501DE069AA002B0034 /* WaveHeader.swift */,
+				03A940541DE22240002B0034 /* StarRating.swift */,
+				03A940561DE22D1F002B0034 /* AnimatedBackground.swift */,
+				03AE5B0E1DE2599600B64A76 /* StarButton.swift */,
+			);
+			name = components;
+			sourceTree = "<group>";
+		};
+		03AE5B141DE3346800B64A76 /* sounds */ = {
+			isa = PBXGroup;
+			children = (
+				03AE5B151DE3347700B64A76 /* rate.mp3 */,
+				03AE5B161DE3347700B64A76 /* send.mp3 */,
+				03AE5B171DE3347700B64A76 /* star1.mp3 */,
+				03AE5B181DE3347700B64A76 /* star2.mp3 */,
+				03AE5B191DE3347700B64A76 /* star3.mp3 */,
+				03AE5B1A1DE3347700B64A76 /* star4.mp3 */,
+				03AE5B1B1DE3347700B64A76 /* star5.mp3 */,
+				03AE5B1C1DE3347700B64A76 /* swoosh.mp3 */,
+			);
+			name = sounds;
 			sourceTree = "<group>";
 		};
 		9ECA7D441A6DF3AAB8EB641D /* Frameworks */ = {
@@ -178,6 +239,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0308A4321DD6287F00D74A1D /* Build configuration list for PBXNativeTarget "rateme" */;
 			buildPhases = (
+				03AE5B251DE3593E00B64A76 /* Lint */,
 				0308A4031DD6287E00D74A1D /* Sources */,
 				0308A4041DD6287E00D74A1D /* Frameworks */,
 				0308A4051DD6287E00D74A1D /* Resources */,
@@ -296,6 +358,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				0308A4181DD6287E00D74A1D /* LaunchScreen.storyboard in Resources */,
+				03AE5B211DE3347700B64A76 /* star3.mp3 in Resources */,
+				03AE5B1F1DE3347700B64A76 /* star1.mp3 in Resources */,
+				03AE5B241DE3347700B64A76 /* swoosh.mp3 in Resources */,
+				03AE5B1D1DE3347700B64A76 /* rate.mp3 in Resources */,
+				03AE5B201DE3347700B64A76 /* star2.mp3 in Resources */,
+				03AE5B231DE3347700B64A76 /* star5.mp3 in Resources */,
+				03AE5B221DE3347700B64A76 /* star4.mp3 in Resources */,
+				03AE5B1E1DE3347700B64A76 /* send.mp3 in Resources */,
+				03AE5B111DE25CE300B64A76 /* star.png in Resources */,
 				0308A4151DD6287E00D74A1D /* Assets.xcassets in Resources */,
 				0308A4101DD6287E00D74A1D /* Main.storyboard in Resources */,
 			);
@@ -318,6 +389,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		03AE5B251DE3593E00B64A76 /* Lint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = Lint;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
+		};
 		3AE18EF45C13D76FC0E085F0 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -415,16 +500,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				03A940551DE22240002B0034 /* StarRating.swift in Sources */,
+				03AE5B0F1DE2599600B64A76 /* StarButton.swift in Sources */,
 				032003381DD79F5C006B536C /* Discovery.swift in Sources */,
 				0320032F1DD73858006B536C /* ICouldUnavailableViewController.swift in Sources */,
 				032003311DD73CB5006B536C /* SignupViewController.swift in Sources */,
 				0308A40D1DD6287E00D74A1D /* RootController.swift in Sources */,
+				03A940531DE220C1002B0034 /* RatePeopleViewController.swift in Sources */,
 				0308A4131DD6287E00D74A1D /* rateme.xcdatamodeld in Sources */,
+				03A940571DE22D1F002B0034 /* AnimatedBackground.swift in Sources */,
 				0308A40B1DD6287E00D74A1D /* AppDelegate.swift in Sources */,
 				032003291DD664EC006B536C /* State.swift in Sources */,
 				0320032D1DD73802006B536C /* LoadingViewController.swift in Sources */,
+				03A9404F1DDE53F3002B0034 /* CloseUserCell.swift in Sources */,
 				0320033A1DD7A881006B536C /* BLEUser.swift in Sources */,
 				032003341DD73CD1006B536C /* InViewController.swift in Sources */,
+				03A940511DE069AA002B0034 /* WaveHeader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

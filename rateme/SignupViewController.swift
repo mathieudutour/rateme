@@ -30,15 +30,13 @@ class SignupViewController: UIViewController, UIImagePickerControllerDelegate, U
         }
         actionSheet.addAction(cancelActionButton)
         
-        let cameraActionButton: UIAlertAction = UIAlertAction(title: "Camera", style: .default)
-        { action -> Void in
+        let cameraActionButton: UIAlertAction = UIAlertAction(title: "Camera", style: .default) { action -> Void in
             self.imagePicker.sourceType = .camera
             self.present(self.imagePicker, animated: true, completion: nil)
         }
         actionSheet.addAction(cameraActionButton)
         
-        let galleryActionButton: UIAlertAction = UIAlertAction(title: "Photo Library", style: .default)
-        { action -> Void in
+        let galleryActionButton: UIAlertAction = UIAlertAction(title: "Photo Library", style: .default) { action -> Void in
             self.imagePicker.sourceType = .photoLibrary
             self.present(self.imagePicker, animated: true, completion: nil)
         }
@@ -63,7 +61,7 @@ class SignupViewController: UIViewController, UIImagePickerControllerDelegate, U
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         picker.dismiss(animated: true, completion: nil)
         let image = info[UIImagePickerControllerOriginalImage]
-        if (image != nil) {
+        if image != nil {
             let imageURL = info[UIImagePickerControllerReferenceURL] as! NSURL
             let imagePath =  imageURL.path!
             let localPath = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(imagePath)

@@ -19,18 +19,17 @@ class BLEUser {
     var iCloudID: String?
     var rssi: Float?
     var record: CKRecord?
-    
+
     var velocity = 0.0
     var targetValue = 0.0
     var currentValue = 0.0
-    
-    
+
     init(peripheral: CBPeripheral) {
         self.peripheral = peripheral
         self.peripheralId = peripheral.identifier.uuidString
         self.updateTime = NSDate().timeIntervalSince1970
     }
-    
+
     func setRssi(rssi: Float) {
         self.rssi = rssi
         self.promixity = convertRSSItoProximity(rssi: rssi)
@@ -43,16 +42,16 @@ class BLEUser {
         // this is based on difference between target and current value
         velocity += (targetValue - currentValue) * 0.01
         velocity *= 0.7
-        
+
         // ease the current value
         currentValue += velocity
-        
+
         // limit how small the ease can get
-        if (abs(targetValue - currentValue) < 0.001) {
+        if abs(targetValue - currentValue) < 0.001 {
             currentValue = targetValue
             velocity = 0.0
         }
-        
+
         // keep above zero
         currentValue = max(0.0, currentValue)
         return currentValue * -1.0

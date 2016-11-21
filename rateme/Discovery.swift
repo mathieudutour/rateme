@@ -18,14 +18,14 @@ class Discovery: NSObject, CBCentralManagerDelegate, CBPeripheralManagerDelegate
     var usersMap: [String : BLEUser] = [:]
     let queue = DispatchQueue(label: "me.dutour.mathieu.discovery")
     let usersBlock: (([BLEUser], Bool) -> Void)?
-    let uuid = CBUUID(string: "B9407F30-F5F8-466E-AFF9-25556B57FE88");
+    let uuid = CBUUID(string: "B9407F30-F5F8-466E-AFF9-25556B57FE88")
     let icloudID: String
-    
+
     init(icloudID: String, usersBlock: @escaping ([BLEUser], Bool) -> Void) {
         self.icloudID = icloudID
         self.usersBlock = usersBlock
         super.init()
-        
+
         self.peripheralManager = CBPeripheralManager(delegate: self, queue: self.queue)
         self.centralManager = CBCentralManager(delegate: self, queue: self.queue)
 
@@ -35,7 +35,7 @@ class Discovery: NSObject, CBCentralManagerDelegate, CBPeripheralManagerDelegate
             name:NSNotification.Name.UIApplicationDidEnterBackground,
             object:nil
         )
-        
+
         // listen for UIApplicationDidEnterBackgroundNotification
         NotificationCenter.default.addObserver(self,
             selector:#selector(stopTimer),
@@ -44,28 +44,6 @@ class Discovery: NSObject, CBCentralManagerDelegate, CBPeripheralManagerDelegate
         )
         
         self.startTimer()
-        
-        let advertisingData = [
-            CBAdvertisementDataLocalNameKey: self.icloudID,
-            CBAdvertisementDataServiceUUIDsKey: self.uuid,
-        ] as [String : Any]
-                
-        // create our characteristics
-        let characteristic = CBMutableCharacteristic(type: self.uuid, properties: CBCharacteristicProperties.read, value:self.icloudID.data(using: String.Encoding.utf8), permissions: CBAttributePermissions.readable)
-                
-        // create the service with the characteristics
-        let service = CBMutableService(type: self.uuid, primary: true)
-        service.characteristics = [characteristic]
-        self.peripheralManager?.add(service)
-        
-        self.peripheralManager?.startAdvertising(advertisingData)
-                    
-        let scanOptions = [CBCentralManagerScanOptionAllowDuplicatesKey: true]
-        let services = [self.uuid]
-        
-        // we only listen to the service that belongs to our uuid
-        // this is important for performance and battery consumption
-        self.centralManager?.scanForPeripherals(withServices: services, options:scanOptions)
     }
     
     @objc func startTimer() {
@@ -75,6 +53,39 @@ class Discovery: NSObject, CBCentralManagerDelegate, CBPeripheralManagerDelegate
     @objc func stopTimer() {
         self.timer?.invalidate()
         self.timer = nil
+    }
+    
+    func startAdvertising() {
+        let advertisingData = [
+            CBAdvertisementDataLocalNameKey: self.icloudID,
+            CBAdvertisementDataServiceUUIDsKey: self.uuid,
+        ] as [String : Any]
+        
+        // create our characteristics
+        let characteristic = CBMutableCharacteristic(
+            type: self.uuid,
+            properties: CBCharacteristicProperties.read,
+            value:self.icloudID.data(using: String.Encoding.utf8),
+            permissions: CBAttributePermissions.readable
+        )
+        
+        // create the service with the characteristics
+        let service = CBMutableService(type: self.uuid, primary: true)
+        service.characteristics = [characteristic]
+        self.peripheralManager?.add(service)
+        
+        print("starting advertising")
+        
+        self.peripheralManager?.startAdvertising(advertisingData)
+    }
+    
+    func startDetecting() {
+        let scanOptions = [CBCentralManagerScanOptionAllowDuplicatesKey: true]
+        let services = [self.uuid]
+        
+        // we only listen to the service that belongs to our uuid
+        // this is important for performance and battery consumption
+        self.centralManager?.scanForPeripherals(withServices: services, options:scanOptions)
     }
     
     @objc func checkList() {
@@ -90,16 +101,16 @@ class Discovery: NSObject, CBCentralManagerDelegate, CBPeripheralManagerDelegate
     
             // We remove the user if we haven't seen him for the userTimeInterval amount of seconds.
             // You can simply set the userTimeInterval variable anything you want.
-            if(diff > self.userTimeoutInterval) {
+            if diff > self.userTimeoutInterval {
                 discardedKeys.append(key)
             }
         }
     
         // update the list if we removed a user.
-        if(discardedKeys.count > 0) {
+        if discardedKeys.count > 0 {
             self.usersMap = self.usersMap.reduce([:], {prev, a in
                 var mutablePrev = prev
-                if (!discardedKeys.contains(a.key)) {
+                if !discardedKeys.contains(a.key) {
                     mutablePrev[a.key] = a.value
                 }
                 return mutablePrev
@@ -123,7 +134,7 @@ class Discovery: NSObject, CBCentralManagerDelegate, CBPeripheralManagerDelegate
             return a.promixity! > b.promixity!
         })
     
-        if (self.usersBlock != nil) {
+        if self.usersBlock != nil {
             self.usersBlock!(users, usersChanged)
         }
     }
@@ -136,22 +147,22 @@ class Discovery: NSObject, CBCentralManagerDelegate, CBPeripheralManagerDelegate
         print("Discovered name : %@", iCloudID!)
     
         var bleUser = self.usersMap[peripheral.identifier.uuidString]
-        if(bleUser == nil) {
+        if bleUser == nil {
             print("Adding ble user: %@", iCloudID!)
             bleUser = BLEUser.init(peripheral: peripheral)
-            bleUser!.iCloudID = nil;
-            bleUser!.peripheral.delegate = self;
+            bleUser!.iCloudID = nil
+            bleUser!.peripheral.delegate = self
     
             self.usersMap[bleUser!.peripheralId] = bleUser!
         }
     
-        if(!bleUser!.identified) {
+        if !bleUser!.identified {
             // We check if we can get the username from the advertisement data,
             // in case the advertising peer application is working at foreground
             // if we get the name from advertisement we don't have to establish a peripheral connection
-            if (iCloudID != nil && (iCloudID as! String).characters.count > 0) {
-                bleUser!.iCloudID = iCloudID as! String?;
-                bleUser!.identified = true;
+            if iCloudID != nil && (iCloudID as! String).characters.count > 0 {
+                bleUser!.iCloudID = iCloudID as! String?
+                bleUser!.identified = true
     
                 // we update our list for callback block
                 self.updateList(usersChanged: false)
@@ -160,7 +171,7 @@ class Discovery: NSObject, CBCentralManagerDelegate, CBPeripheralManagerDelegate
                 // we have to connect to the peripheral and try to get the characteristic data
                 // add we will extract the username from characteristics.
     
-                if (peripheral.state == CBPeripheralState.disconnected) {
+                if peripheral.state == CBPeripheralState.disconnected {
                     self.centralManager?.connect(peripheral, options:nil)
                 }
             }
@@ -168,7 +179,7 @@ class Discovery: NSObject, CBCentralManagerDelegate, CBPeripheralManagerDelegate
     
         // update the rss and update time
         bleUser!.setRssi(rssi: RSSI.floatValue)
-        bleUser!.updateTime = NSDate().timeIntervalSince1970;
+        bleUser!.updateTime = NSDate().timeIntervalSince1970
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
@@ -183,8 +194,9 @@ class Discovery: NSObject, CBCentralManagerDelegate, CBPeripheralManagerDelegate
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         // loop the services
-        // since we are looking forn only one service, services array probably contains only one or zero item
-        if (error != nil) {
+        // since we are looking for only one service, services array probably contains only one or zero item
+        if error != nil {
+            print(peripheral)
             for service in peripheral.services! {
                 peripheral.discoverCharacteristics(nil, for:service)
             }
@@ -192,10 +204,10 @@ class Discovery: NSObject, CBCentralManagerDelegate, CBPeripheralManagerDelegate
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        if (error != nil) {
+        if error != nil {
             // loop through to find our characteristic
             for characteristic in service.characteristics! {
-                if (characteristic.uuid.isEqual(self.uuid)) {
+                if characteristic.uuid.isEqual(self.uuid) {
                     peripheral.readValue(for: characteristic)
                 }
             }
@@ -206,7 +218,7 @@ class Discovery: NSObject, CBCentralManagerDelegate, CBPeripheralManagerDelegate
         let valueStr = NSString(data: characteristic.value!, encoding:String.Encoding.utf8.rawValue)
         
         // if the value is not nil, we found our username!
-        if (valueStr != nil) {
+        if valueStr != nil {
             let user = self.usersMap[peripheral.identifier.uuidString]
             user?.iCloudID = valueStr as String?
             user?.identified = true
@@ -222,11 +234,19 @@ class Discovery: NSObject, CBCentralManagerDelegate, CBPeripheralManagerDelegate
     }
     
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
-        
+        if peripheral.state == CBManagerState.poweredOn {
+            self.startAdvertising()
+        } else {
+            //NSLog(@"Peripheral manager state: %d", peripheral.state);
+        }
     }
     
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        
+        if central.state == CBManagerState.poweredOn {
+            self.startDetecting()
+        } else {
+            //NSLog(@"Central manager state: %d", central.state);
+        }
     }
 
 }
