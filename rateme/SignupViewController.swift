@@ -82,6 +82,6 @@ class SignupViewController: UIViewController, UIImagePickerControllerDelegate, U
     }
 
     @IBAction func signup(_ sender: Any) {
-//        State.sharedInstance.signup(avatar: avatarURL! as URL)
+//        Redux.signup(avatar: avatarURL! as URL)
     }
 }

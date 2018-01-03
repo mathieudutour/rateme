@@ -16,13 +16,16 @@
 		0308A4231DD6287F00D74A1D /* ratemeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0308A4221DD6287F00D74A1D /* ratemeTests.swift */; };
 		0308A42E1DD6287F00D74A1D /* ratemeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0308A42D1DD6287F00D74A1D /* ratemeUITests.swift */; };
 		032003271DD657F1006B536C /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 032003261DD657F1006B536C /* CloudKit.framework */; };
-		032003291DD664EC006B536C /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032003281DD664EC006B536C /* State.swift */; };
+		032003291DD664EC006B536C /* Redux.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032003281DD664EC006B536C /* Redux.swift */; };
 		0320032D1DD73802006B536C /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0320032C1DD73802006B536C /* LoadingViewController.swift */; };
 		0320032F1DD73858006B536C /* ICouldUnavailableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0320032E1DD73858006B536C /* ICouldUnavailableViewController.swift */; };
 		032003311DD73CB5006B536C /* SignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032003301DD73CB5006B536C /* SignupViewController.swift */; };
 		032003341DD73CD1006B536C /* InViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032003331DD73CD1006B536C /* InViewController.swift */; };
 		032003381DD79F5C006B536C /* Discovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032003371DD79F5C006B536C /* Discovery.swift */; };
 		0320033A1DD7A881006B536C /* BLEUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032003391DD7A881006B536C /* BLEUser.swift */; };
+		03252FB81FFD0CFC0028A95D /* Subscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03252FB71FFD0CFC0028A95D /* Subscriber.swift */; };
+		03252FBA1FFD0D540028A95D /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03252FB91FFD0D540028A95D /* State.swift */; };
+		03252FBC1FFD0DB00028A95D /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03252FBB1FFD0DB00028A95D /* Actions.swift */; };
 		03A9404F1DDE53F3002B0034 /* CloseUserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A9404E1DDE53F3002B0034 /* CloseUserCell.swift */; };
 		03A940511DE069AA002B0034 /* WaveHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A940501DE069AA002B0034 /* WaveHeader.swift */; };
 		03A940531DE220C1002B0034 /* RatePeopleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A940521DE220C1002B0034 /* RatePeopleViewController.swift */; };
@@ -74,13 +77,16 @@
 		0308A42F1DD6287F00D74A1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		032003251DD657EF006B536C /* rateme.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = rateme.entitlements; sourceTree = "<group>"; };
 		032003261DD657F1006B536C /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
-		032003281DD664EC006B536C /* State.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
+		032003281DD664EC006B536C /* Redux.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Redux.swift; sourceTree = "<group>"; };
 		0320032C1DD73802006B536C /* LoadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
 		0320032E1DD73858006B536C /* ICouldUnavailableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ICouldUnavailableViewController.swift; sourceTree = "<group>"; };
 		032003301DD73CB5006B536C /* SignupViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignupViewController.swift; sourceTree = "<group>"; };
 		032003331DD73CD1006B536C /* InViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InViewController.swift; sourceTree = "<group>"; };
 		032003371DD79F5C006B536C /* Discovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Discovery.swift; sourceTree = "<group>"; };
 		032003391DD7A881006B536C /* BLEUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEUser.swift; sourceTree = "<group>"; };
+		03252FB71FFD0CFC0028A95D /* Subscriber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscriber.swift; sourceTree = "<group>"; };
+		03252FB91FFD0D540028A95D /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
+		03252FBB1FFD0DB00028A95D /* Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
 		03A9404E1DDE53F3002B0034 /* CloseUserCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloseUserCell.swift; sourceTree = "<group>"; };
 		03A940501DE069AA002B0034 /* WaveHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaveHeader.swift; sourceTree = "<group>"; };
 		03A940521DE220C1002B0034 /* RatePeopleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatePeopleViewController.swift; sourceTree = "<group>"; };
@@ -151,7 +157,7 @@
 				03A9404D1DDE53D1002B0034 /* components */,
 				032003251DD657EF006B536C /* rateme.entitlements */,
 				0308A40A1DD6287E00D74A1D /* AppDelegate.swift */,
-				032003281DD664EC006B536C /* State.swift */,
+				03252FB61FFD0CD90028A95D /* Redux */,
 				03AE5B141DE3346800B64A76 /* sounds */,
 				032003391DD7A881006B536C /* BLEUser.swift */,
 				032003371DD79F5C006B536C /* Discovery.swift */,
@@ -181,6 +187,17 @@
 				0308A42F1DD6287F00D74A1D /* Info.plist */,
 			);
 			path = ratemeUITests;
+			sourceTree = "<group>";
+		};
+		03252FB61FFD0CD90028A95D /* Redux */ = {
+			isa = PBXGroup;
+			children = (
+				032003281DD664EC006B536C /* Redux.swift */,
+				03252FBB1FFD0DB00028A95D /* Actions.swift */,
+				03252FB91FFD0D540028A95D /* State.swift */,
+				03252FB71FFD0CFC0028A95D /* Subscriber.swift */,
+			);
+			name = Redux;
 			sourceTree = "<group>";
 		};
 		036619FD1DD8DDBA00038FEF /* views */ = {
@@ -493,12 +510,15 @@
 				032003381DD79F5C006B536C /* Discovery.swift in Sources */,
 				0320032F1DD73858006B536C /* ICouldUnavailableViewController.swift in Sources */,
 				032003311DD73CB5006B536C /* SignupViewController.swift in Sources */,
+				03252FBA1FFD0D540028A95D /* State.swift in Sources */,
 				0308A40D1DD6287E00D74A1D /* RootController.swift in Sources */,
+				03252FBC1FFD0DB00028A95D /* Actions.swift in Sources */,
 				03A940531DE220C1002B0034 /* RatePeopleViewController.swift in Sources */,
 				0308A4131DD6287E00D74A1D /* rateme.xcdatamodeld in Sources */,
 				03A940571DE22D1F002B0034 /* AnimatedBackground.swift in Sources */,
 				0308A40B1DD6287E00D74A1D /* AppDelegate.swift in Sources */,
-				032003291DD664EC006B536C /* State.swift in Sources */,
+				032003291DD664EC006B536C /* Redux.swift in Sources */,
+				03252FB81FFD0CFC0028A95D /* Subscriber.swift in Sources */,
 				0320032D1DD73802006B536C /* LoadingViewController.swift in Sources */,
 				03A9404F1DDE53F3002B0034 /* CloseUserCell.swift in Sources */,
 				0320033A1DD7A881006B536C /* BLEUser.swift in Sources */,

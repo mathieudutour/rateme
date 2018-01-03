@@ -10,10 +10,12 @@ import UIKit
 
 class AnimatedBackground: UIView, CAAnimationDelegate {
     var gradient = CAGradientLayer()
+    // F2E3E0
     var toColors = [
         UIColor(red: 0.949, green: 0.89, blue: 0.88, alpha: 1.0).cgColor,
         UIColor(red: 0.949, green: 0.89, blue: 0.88, alpha: 1.0).cgColor
     ]
+    // FCE3E0
     var fromColors = [
         UIColor(red:0.99, green:0.88, blue:0.84, alpha:1.0).cgColor,
         UIColor(red:0.99, green:0.88, blue:0.84, alpha:1.0).cgColor
@@ -25,6 +27,7 @@ class AnimatedBackground: UIView, CAAnimationDelegate {
         self.gradient.colors = self.fromColors
         self.layer.insertSublayer(self.gradient, at: 0)
 
+        // F2E3E0
         self.backgroundColor = UIColor(red: 0.949, green: 0.89, blue: 0.88, alpha: 1.0)
 
         animateLayer()

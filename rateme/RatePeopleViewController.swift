@@ -37,7 +37,7 @@ class RatePeopleViewController: UIViewController, UIGestureRecognizerDelegate {
 
     @IBAction func onSwipeUp(_ sender: UISwipeGestureRecognizer) {
         if starRating.rating > 0 {
-            Redux.sharedInstance.rate(iCloudId: (userToRate?.iCloudID)!, rating: starRating.rating)
+            Redux.rate(iCloudId: (userToRate?.iCloudID)!, rating: starRating.rating)
             audioPlayer.play()
             self.navigationController?.popViewController(animated: true)
         } else {

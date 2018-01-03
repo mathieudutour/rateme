@@ -11,7 +11,7 @@ import UIKit
 let headerHeigh: CGFloat = 300.0
 
 class InViewController: UITableViewController, Subscriber {
-    var identifier = generateIdentifier()
+    var identifier = Redux.generateIdentifier()
     var users: [BLEUser] = []
     let smallFont = UIFont.systemFont(ofSize: 60, weight: UIFont.Weight.thin)
     let bigFont = UIFont.systemFont(ofSize: 120, weight: UIFont.Weight.thin)
@@ -40,11 +40,11 @@ class InViewController: UITableViewController, Subscriber {
         numberFormater.minimumFractionDigits = 3
         numberFormater.roundingMode = .halfUp
 
-        Redux.sharedInstance.subscribe(listener: self)
+        Redux.subscribe(listener: self)
     }
 
     deinit {
-        Redux.sharedInstance.unsubscribe(listener: self)
+        Redux.unsubscribe(listener: self)
     }
 
     func update(state: State, previousState: State) {

@@ -9,16 +9,16 @@
 import UIKit
 
 class RootController: UINavigationController, Subscriber {
-    var identifier = generateIdentifier()
+    var identifier = Redux.generateIdentifier()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setNavigationBarHidden(true, animated: false)
-        Redux.sharedInstance.subscribe(listener: self)
+        Redux.subscribe(listener: self)
     }
 
     deinit {
-        Redux.sharedInstance.unsubscribe(listener: self)
+        Redux.unsubscribe(listener: self)
     }
 
     func update(state: State, previousState: State) {
