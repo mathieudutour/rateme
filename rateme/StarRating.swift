@@ -20,7 +20,7 @@ class StarRating: UIView {
     let spacing = 0
     let buttonSize = 60
 
-    func ratingButtonTapped(button: StarButton) {
+    @objc func ratingButtonTapped(button: StarButton) {
         rating = ratingButtons.index(of: button)! + 1
         updateButtonSelectionStates()
     }

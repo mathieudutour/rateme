@@ -80,7 +80,7 @@ class WaveHeader: AnimatedBackground {
         initialized = true
     }
 
-    func startAnimation() {
+    @objc func startAnimation() {
         if !self.animating {
             animateLayer()
 
@@ -125,7 +125,7 @@ class WaveHeader: AnimatedBackground {
         }
     }
 
-    func stopAnimation() {
+    @objc func stopAnimation() {
         print("stop animating")
         self.waveCrestTimer.invalidate()
         self.lineLayers.forEach({layer in

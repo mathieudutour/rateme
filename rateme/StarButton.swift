@@ -147,7 +147,7 @@ open class StarButton: UIButton {
         circleShape.mask = circleMask
 
         let maskPath = UIBezierPath(rect: imageFrame)
-        maskPath.addArc(withCenter: imgCenterPoint, radius: 0.1, startAngle: CGFloat(0.0), endAngle: CGFloat(M_PI * 2), clockwise: true)
+        maskPath.addArc(withCenter: imgCenterPoint, radius: 0.1, startAngle: CGFloat(0.0), endAngle: CGFloat(Double.pi * 2), clockwise: true)
         circleMask.path = maskPath.cgPath
 
         //===============
@@ -174,7 +174,7 @@ open class StarButton: UIButton {
             line.strokeStart = 0.0
             line.strokeEnd = 0.0
             line.opacity = 0.0
-            line.transform = CATransform3DMakeRotation(CGFloat(M_PI) / 5 * (CGFloat(i) * 2 + 1), 0.0, 0.0, 1.0)
+            line.transform = CATransform3DMakeRotation(CGFloat(Double.pi / 5) * (CGFloat(i) * 2 + 1), 0.0, 0.0, 1.0)
             self.layer.addSublayer(line)
             lines.append(line)
         }
@@ -364,19 +364,19 @@ open class StarButton: UIButton {
         self.addTarget(self, action: #selector(touchCancel(_:)), for: .touchCancel)
     }
 
-    func touchDown(_ sender: StarButton) {
+    @objc func touchDown(_ sender: StarButton) {
         self.layer.opacity = 0.4
     }
-    func touchUpInside(_ sender: StarButton) {
+    @objc func touchUpInside(_ sender: StarButton) {
         self.layer.opacity = 1.0
     }
-    func touchDragExit(_ sender: StarButton) {
+    @objc func touchDragExit(_ sender: StarButton) {
         self.layer.opacity = 1.0
     }
-    func touchDragEnter(_ sender: StarButton) {
+    @objc func touchDragEnter(_ sender: StarButton) {
         self.layer.opacity = 0.4
     }
-    func touchCancel(_ sender: StarButton) {
+    @objc func touchCancel(_ sender: StarButton) {
         self.layer.opacity = 1.0
     }
 

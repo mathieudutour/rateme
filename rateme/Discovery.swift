@@ -160,7 +160,7 @@ class Discovery: NSObject, CBCentralManagerDelegate, CBPeripheralManagerDelegate
             // We check if we can get the username from the advertisement data,
             // in case the advertising peer application is working at foreground
             // if we get the name from advertisement we don't have to establish a peripheral connection
-            if iCloudID != nil && (iCloudID as! String).characters.count > 0 {
+            if iCloudID != nil && (iCloudID as! String).count > 0 {
                 bleUser!.iCloudID = iCloudID as! String?
                 bleUser!.identified = true
 

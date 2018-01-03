@@ -13,8 +13,8 @@ let headerHeigh: CGFloat = 300.0
 class InViewController: UITableViewController, Subscriber {
     var identifier = generateIdentifier()
     var users: [BLEUser] = []
-    let smallFont = UIFont.systemFont(ofSize: 60, weight: UIFontWeightThin)
-    let bigFont = UIFont.systemFont(ofSize: 120, weight: UIFontWeightThin)
+    let smallFont = UIFont.systemFont(ofSize: 60, weight: UIFont.Weight.thin)
+    let bigFont = UIFont.systemFont(ofSize: 120, weight: UIFont.Weight.thin)
     let numberFormater = NumberFormatter()
 
     @IBOutlet weak var waveHeader: WaveHeader!
@@ -55,9 +55,9 @@ class InViewController: UITableViewController, Subscriber {
         if (state.currentUser?["score"]) != nil {
             let score = NSMutableAttributedString(string: numberFormater.string(from: NSNumber(value: state.currentUser?["score"] as! Double * 5.0))!)
             let bigRange = NSRange(location: 0, length: 3)
-            score.addAttribute(NSFontAttributeName, value: bigFont, range: bigRange)
+            score.addAttribute(NSAttributedStringKey.font, value: bigFont, range: bigRange)
             let smallRange = NSRange(location: 3, length: 2)
-            score.addAttribute(NSFontAttributeName, value: smallFont, range: smallRange)
+            score.addAttribute(NSAttributedStringKey.font, value: smallFont, range: smallRange)
             scoreLabel.attributedText = score
         }
     }

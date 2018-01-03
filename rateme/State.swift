@@ -61,8 +61,15 @@ class Redux {
         iCloudUserIDAsync() {
             recordID, error in
             if let userID = recordID?.recordName {
+                // storing the current userId
                 self.state.recordId = CKRecordID(recordName: userID)
-                self.publicDB.fetch(withRecordID: self.state.recordId!) { fetchedUser, error in
+                
+                // starting to fetch the current user
+                let fetchingCurrentUser = CKFetchRecordsOperation.init(recordIDs: [self.state.recordId!])
+                fetchingCurrentUser.qualityOfService = .userInteractive
+                fetchingCurrentUser.database = self.publicDB
+                
+                fetchingCurrentUser.fetchRecordsCompletionBlock = { fetchedUsers, error in
                     if error != nil {
                         print(error!.localizedDescription)
                         self.state.loading = false
@@ -70,6 +77,8 @@ class Redux {
                         self.dispatch()
                         return
                     }
+                    
+                    let fetchedUser = fetchedUsers![self.state.recordId!]
 
                     if fetchedUser?["username"] == nil {
                         // signup
@@ -135,6 +144,7 @@ class Redux {
                         }
                     }
                 }
+                fetchingCurrentUser.start()
             } else {
                 self.state.loading = false
                 self.state.icloudUnavailable = true
@@ -254,7 +264,7 @@ class Redux {
                 print(error!.localizedDescription)
                 complete(nil, error as NSError?)
             } else {
-                print("fetched ID \(recordID?.recordName)")
+                print("fetched ID \(recordID?.recordName ?? "unknown")")
                 complete(recordID, nil)
             }
         }
