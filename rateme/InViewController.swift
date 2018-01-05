@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 let headerHeigh: CGFloat = 300.0
 
@@ -16,6 +17,40 @@ class InViewController: UITableViewController, Subscriber {
     let smallFont = UIFont.systemFont(ofSize: 60, weight: UIFont.Weight.thin)
     let bigFont = UIFont.systemFont(ofSize: 120, weight: UIFont.Weight.thin)
     let numberFormater = NumberFormatter()
+    
+    var swooshSound = NSURL(fileURLWithPath: Bundle.main.path(forResource: "swoosh", ofType: "mp3")!)
+    var audioPlayer = AVAudioPlayer()
+    
+    lazy var bulletinManager: BulletinManager = {
+        
+        let page = RateBulletinItem()
+        
+        page.actionButtonTitle = "Rate"
+        page.alternativeButtonTitle = "Not now"
+        
+        page.appearance.actionButtonColor = PURPLE
+        page.appearance.alternativeButtonColor = PURPLE
+        page.appearance.actionButtonTitleColor = PINK
+        page.isDismissable = true
+        
+        page.alternativeHandler = { (item: ActionBulletinItem) in
+            item.manager?.dismissBulletin()
+        }
+        
+        page.actionHandler = { (item: ActionBulletinItem) in
+            if page.starRating.rating > 0 {
+                Redux.rate(iCloudId: (page.userToRate?.iCloudID!)!, rating: page.starRating.rating)
+                self.audioPlayer.play()
+                self.navigationController?.popViewController(animated: true)
+                item.manager?.dismissBulletin()
+            } else {
+                // TODO shake
+            }
+        }
+        
+        return BulletinManager(rootItem: page)
+        
+    }()
 
     @IBOutlet weak var waveHeader: WaveHeader!
     @IBOutlet weak var scoreLabel: UILabel!
@@ -27,6 +62,11 @@ class InViewController: UITableViewController, Subscriber {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: swooshSound as URL)
+            audioPlayer.prepareToPlay()
+        } catch {}
 
         tableView.tableHeaderView = nil
         tableView.addSubview(waveHeader)
@@ -41,6 +81,9 @@ class InViewController: UITableViewController, Subscriber {
         numberFormater.roundingMode = .halfUp
 
         Redux.subscribe(listener: self)
+        
+        bulletinManager.backgroundViewStyle = .blurredLight
+        bulletinManager.prepare()
     }
 
     deinit {
@@ -48,37 +91,55 @@ class InViewController: UITableViewController, Subscriber {
     }
 
     func update(state: State, previousState: State) {
-        self.users = state.closeUsers.filter({user in
+        self.users = state.nearbyUsers.filter({user in
+            print(user.record ?? "")
             return user.record != nil
         })
 
         if (state.currentUser?["score"]) != nil {
-            let score = NSMutableAttributedString(string: numberFormater.string(from: NSNumber(value: state.currentUser?["score"] as! Double * 5.0))!)
-            let bigRange = NSRange(location: 0, length: 3)
-            score.addAttribute(NSAttributedStringKey.font, value: bigFont, range: bigRange)
-            let smallRange = NSRange(location: 3, length: 2)
-            score.addAttribute(NSAttributedStringKey.font, value: smallFont, range: smallRange)
-            scoreLabel.attributedText = score
+            DispatchQueue.main.async {
+                let score = NSMutableAttributedString(string: self.numberFormater.string(from: NSNumber(value: state.currentUser?["score"] as! Double * 5.0))!)
+                let bigRange = NSRange(location: 0, length: 3)
+                score.addAttribute(NSAttributedStringKey.font, value: self.bigFont, range: bigRange)
+                let smallRange = NSRange(location: 3, length: 2)
+                score.addAttribute(NSAttributedStringKey.font, value: self.smallFont, range: smallRange)
+                self.scoreLabel.attributedText = score
+                self.tableView.reloadData()
+                self.waveHeader.updateWhenScrolling(tableView: self.tableView)
+            }
         }
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.users.count
     }
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        if self.users.count > 0 {
+            tableView.separatorStyle = .singleLine
+            tableView.backgroundView = nil
+            return 1
+        }
+        
+        let noDataLabel: UILabel     = UILabel(frame: CGRect(x: 0, y: 0, width: tableView.bounds.size.width, height: tableView.bounds.size.height))
+        noDataLabel.text          = "Nobody around"
+        noDataLabel.textColor     = UIColor.black
+        noDataLabel.textAlignment = .center
+        tableView.backgroundView  = noDataLabel
+        tableView.separatorStyle  = .none
+        return 0
+    }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = self.tableView.dequeueReusableCell(withIdentifier: "cell")! as! CloseUserCell
-
         cell.user = self.users[indexPath.row]
-
         return cell
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let storyboard = UIStoryboard.init(name: "Main", bundle: nil)
-        let vc = storyboard.instantiateViewController(withIdentifier: "RatePeople") as! RatePeopleViewController
-        vc.userToRate = self.users[indexPath.row]
-        self.navigationController?.pushViewController(vc, animated: true)
+        (bulletinManager.currentItem as! RateBulletinItem).userToRate = self.users[indexPath.row]
+        bulletinManager.refreshCurrentItemInterface()
+        bulletinManager.presentBulletin(above: self)
     }
 
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {

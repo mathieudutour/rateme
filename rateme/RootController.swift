@@ -28,6 +28,8 @@ class RootController: UINavigationController, Subscriber {
                 self.setViewControllers([storyboard.instantiateViewController(withIdentifier: "Loading")], animated: false)
             } else if state.icloudUnavailable && previousState.icloudUnavailable != state.icloudUnavailable {
                 self.setViewControllers([storyboard.instantiateViewController(withIdentifier: "iCouldUnavailable")], animated: false)
+            } else if state.needToSignup && previousState.needToSignup != state.needToSignup {
+                self.setViewControllers([storyboard.instantiateViewController(withIdentifier: "Signup")], animated: false)
             } else if state.loggedin && previousState.loggedin != state.loggedin {
                 self.setViewControllers([storyboard.instantiateViewController(withIdentifier: "In")], animated: false)
             }
