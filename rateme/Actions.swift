@@ -223,6 +223,14 @@ extension Redux {
                 ) as CKRecordValue?
                 fetchedUser?["ratings"] = fetchedUser?["ratings"] as! Int + 1 as CKRecordValue?
                 
+                let index = instance.state.nearbyUsers.index(where: {closeUser in
+                    return closeUser.iCloudID == iCloudID
+                })
+                if index != nil {
+                    instance.state.nearbyUsers[index!].record = fetchedUser
+                    instance.dispatch()
+                }
+                
                 let operations = CKModifyRecordsOperation(recordsToSave: [ratingRecord, fetchedUser!], recordIDsToDelete: nil)
                 
                 operations.completionBlock = {
