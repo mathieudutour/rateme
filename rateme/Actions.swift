@@ -138,6 +138,8 @@ extension Redux {
             operation.completionBlock = {
                 instance.state.loading = false
                 instance.state.loggedin = true
+                instance.state.needToSignup = false
+                instance.state.tempRecord = nil
                 instance.listenToRatings()
                 instance.startDiscovery()
                 instance.dispatch()
