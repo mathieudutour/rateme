@@ -8,8 +8,13 @@
 
 import UIKit
 
+private let smallRange = NSRange(location: 3, length: 2)
+private let bigRange = NSRange(location: 0, length: 3)
+private let smallFont = UIFont.systemFont(ofSize: 10, weight: UIFont.Weight.thin)
+private let bigFont = UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.thin)
+
 class CloseUserCell: UITableViewCell {
-    let numberFormater = NumberFormatter()
+    private var numberFormater = NumberFormatter()
 
     @IBOutlet weak var username: UILabel!
     @IBOutlet weak var score: UILabel!
@@ -19,19 +24,30 @@ class CloseUserCell: UITableViewCell {
             setUsernameAndScore()
         }
     }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        
+        numberFormater.numberStyle = .decimal
+        numberFormater.maximumFractionDigits = 3
+        numberFormater.minimumFractionDigits = 3
+        numberFormater.roundingMode = .halfUp
+    }
 
     func setUsernameAndScore() {
         if username != nil {
             if user != nil {
-                numberFormater.numberStyle = .decimal
-                numberFormater.maximumFractionDigits = 3
-                numberFormater.minimumFractionDigits = 3
-                numberFormater.roundingMode = .halfUp
                 self.username.text = user?.record?["username"] as! String?
-                self.score.attributedText = NSMutableAttributedString(string: numberFormater.string(from: NSNumber(value: user?.record?["score"] as! Double * 5.0))!)
+                let score = NSMutableAttributedString(string: self.numberFormater.string(from: NSNumber(value: user?.record?["score"] as! Double * 5.0))!)
+                score.addAttribute(NSAttributedStringKey.font, value: bigFont, range: bigRange)
+                score.addAttribute(NSAttributedStringKey.font, value: smallFont, range: smallRange)
+                self.score.attributedText = score
             } else {
                 self.username.text = "username"
-                self.score.text = "2.500"
+                let score = NSMutableAttributedString(string: numberFormater.string(from: 2.5)!)
+                score.addAttribute(NSAttributedStringKey.font, value: bigFont, range: bigRange)
+                score.addAttribute(NSAttributedStringKey.font, value: smallFont, range: smallRange)
+                self.score.attributedText = score
             }
         }
     }

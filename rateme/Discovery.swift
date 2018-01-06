@@ -11,7 +11,7 @@ import CoreBluetooth
 import CloudKit
 
 let SERVICE_UUID = CBUUID(string: "B9407F30-F5F8-466E-AFF9-25556B57FE88")
-let USER_TIMEOUT_INTERVAL = TimeInterval(3)
+let USER_TIMEOUT_INTERVAL = TimeInterval(6)
 let UPDATE_INTERVAL = TimeInterval(2)
 
 class Discovery: NSObject {
@@ -90,21 +90,21 @@ class Discovery: NSObject {
 
     @objc func checkList() {
         let currentTime = NSDate().timeIntervalSince1970
-
+        
         var discardedKeys: [String] = []
-
+        
         for key in self.usersMap.keys {
             let bleUser = self.usersMap[key]!
-
+            
             let diff = currentTime - bleUser.updateTime
-
+            
             // We remove the user if we haven't seen him for the userTimeInterval amount of seconds.
             // You can simply set the userTimeInterval variable anything you want.
             if diff > USER_TIMEOUT_INTERVAL {
                 discardedKeys.append(key)
             }
         }
-
+        
         // update the list if we removed a user.
         if discardedKeys.count > 0 {
             self.usersMap = self.usersMap.reduce([:], {prev, a in
@@ -114,17 +114,48 @@ class Discovery: NSObject {
                 }
                 return mutablePrev
             })
-            self.updateList()
-        } else {
-            // simply update the list, because the order of the users may have changed.
-            self.updateList()
         }
+        
+        // fetch the users for which we don't have the record
+        for key in self.usersMap.keys {
+            let bleUser = self.usersMap[key]!
+            if (bleUser.iCloudID != nil && bleUser.record == nil && !bleUser.fetchingRecord) {
+                bleUser.fetchingRecord = true
+                
+                let recordId = CKRecordID(recordName: bleUser.iCloudID! as String)
+                
+                let fetchingUser = CKFetchRecordsOperation.init(recordIDs: [recordId])
+                fetchingUser.qualityOfService = .userInitiated
+                fetchingUser.database = self.publicDB
+                
+                fetchingUser.fetchRecordsCompletionBlock = { fetchedUsers, error in
+                    bleUser.fetchingRecord = false
+                    if error != nil {
+                        print(error!.localizedDescription)
+                        return
+                    }
+                    
+                    let fetchedUser = fetchedUsers![recordId]
+                    bleUser.record = fetchedUser
+                    self.updateList()
+                }
+                fetchingUser.start()
+                
+            }
+        }
+        
+        // simply update the list, because the order of the users may have changed.
+        self.updateList()
     }
 
     func updateList() {
-
+        var iCloudIds : [String : Bool] = [:]
         var users = Array(self.usersMap.values).filter({user in
-            return user.identified
+            if (user.record != nil && user.iCloudID != nil && iCloudIds[user.iCloudID!] == nil) {
+                iCloudIds[user.iCloudID!] = true
+                return true
+            }
+            return false
         })
 
         // we sort the list according to "proximity".
@@ -145,20 +176,21 @@ extension Discovery: CBCentralManagerDelegate {
         
         var bleUser = self.usersMap[peripheral.identifier.uuidString]
         if bleUser == nil {
-            bleUser = BLEUser.init(peripheral: peripheral)
-            bleUser!.iCloudID = nil
+            self.usersMap[peripheral.identifier.uuidString] = BLEUser(peripheral: peripheral)
+            bleUser = self.usersMap[peripheral.identifier.uuidString]
             bleUser!.peripheral.delegate = self
-            
-            self.usersMap[bleUser!.peripheralId] = bleUser!
         }
         
-        if !bleUser!.identified {
+        // update the rss and update time
+        bleUser!.setRssi(rssi: RSSI.floatValue)
+        bleUser!.updateTime = NSDate().timeIntervalSince1970
+        
+        if bleUser!.iCloudID == nil {
             // We check if we can get the username from the advertisement data,
             // in case the advertising peer application is working at foreground
             // if we get the name from advertisement we don't have to establish a peripheral connection
             if iCloudID != nil && (iCloudID as! String).count > 0 {
                 bleUser!.iCloudID = iCloudID as! String?
-                bleUser!.identified = true
                 
                 // we update our list for callback block
                 self.updateList()
@@ -172,10 +204,6 @@ extension Discovery: CBCentralManagerDelegate {
                 }
             }
         }
-        
-        // update the rss and update time
-        bleUser!.setRssi(rssi: RSSI.floatValue)
-        bleUser!.updateTime = NSDate().timeIntervalSince1970
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
@@ -272,35 +300,16 @@ extension Discovery: CBPeripheralDelegate {
         let valueStr = NSString(data: characteristic.value!, encoding:String.Encoding.utf8.rawValue)
         // if the value is not nil, we found our username!
         if valueStr != nil {
-            let user = self.usersMap[peripheral.identifier.uuidString]
-            user?.iCloudID = valueStr! as String
-            user?.identified = true
-            
-            let recordId = CKRecordID(recordName: valueStr! as String)
-            
-            let fetchingUser = CKFetchRecordsOperation.init(recordIDs: [recordId])
-            fetchingUser.qualityOfService = .utility
-            fetchingUser.database = self.publicDB
-            
-            fetchingUser.fetchRecordsCompletionBlock = { fetchedUsers, error in
-                if error != nil {
-                    print(error!.localizedDescription)
-                    return
-                }
+            if let user = self.usersMap[peripheral.identifier.uuidString] {
+                user.iCloudID = valueStr! as String
+                self.checkList()
                 
-                let fetchedUser = fetchedUsers![recordId]
-                user?.record = fetchedUser
-                self.updateList()
+                // cancel the subscription to our characteristic
+                peripheral.setNotifyValue(false, for:characteristic)
+                
+                // and disconnect from the peripehral
+                self.centralManager?.cancelPeripheralConnection(peripheral)
             }
-            fetchingUser.start()
-            
-            self.updateList()
-            
-            // cancel the subscription to our characteristic
-            peripheral.setNotifyValue(false, for:characteristic)
-            
-            // and disconnect from the peripehral
-            self.centralManager?.cancelPeripheralConnection(peripheral)
         }
     }
 }

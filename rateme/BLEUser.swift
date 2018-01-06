@@ -14,10 +14,11 @@ class BLEUser {
     let peripheral: CBPeripheral
     let peripheralId: String
     var updateTime: TimeInterval
-    var identified = false
     var promixity: Double?
     var iCloudID: String?
     var rssi: Float?
+    
+    var fetchingRecord = false
     var record: CKRecord?
 
     var velocity = 0.0

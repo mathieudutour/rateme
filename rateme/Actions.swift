@@ -75,7 +75,6 @@ extension Redux {
     private func startDiscovery() {
         // start Discovery
         self.discovery = Discovery.init(icloudID: (self.state.recordId?.recordName)!, usersBlock: {users in
-            var usersToQuery: [BLEUser] = []
             self.state.nearbyUsers = users.map({user in
                 let index = self.state.nearbyUsers.index(where: {closeUser in
                     return closeUser.iCloudID == user.iCloudID
@@ -84,40 +83,11 @@ extension Redux {
                     self.state.nearbyUsers[index!].promixity = user.promixity
                     return self.state.nearbyUsers[index!]
                 } else {
-                    usersToQuery.append(user)
                     return user
                 }
             })
             
-            if (usersToQuery.count == 0) {
-                self.dispatch()
-                return
-            }
-            
-            print("Discovered new users: ", usersToQuery.count)
-            
-            let query = CKQuery(
-                recordType: "Users",
-                predicate: NSPredicate(format: "recordID IN %@", usersToQuery.filter({user in
-                    return user.iCloudID != nil
-                }).map({user in
-                    return CKRecordID(recordName: user.iCloudID!)
-                }))
-            )
-            
-            self.publicDB.perform(query, inZoneWith: nil) { (records, error) in
-                for record in records! {
-                    let index = self.state.nearbyUsers.index(where: {closeUser in
-                        return closeUser.iCloudID! == record.recordID.recordName
-                    })
-                    if index != nil {
-                        self.state.nearbyUsers[index!].record = record
-                    } else {
-                        print("no found")
-                    }
-                }
-                self.dispatch()
-            }
+            self.dispatch()
         })
     }
 
@@ -230,11 +200,14 @@ extension Redux {
                 return
             }
             instance.publicDB.fetch(withRecordID: CKRecordID(recordName: iCloudId)) { fetchedUser, error in
+                if (error != nil) {
+                    print(error!)
+                    return
+                }
                 let ratingRecord = CKRecord(recordType: "Rating")
-                ratingRecord["rating"] = (Double(rating - 1) / 4.0) as CKRecordValue?
+                ratingRecord["rating"] = starsToScore(rating) as CKRecordValue?
                 ratingRecord["rater"] = rater
                 ratingRecord["ratee"] = ratee
-                ratingRecord["createdAt"] = NSDate().timeIntervalSince1970 as CKRecordValue?
                 
                 if fetchedUser?["ratings"] == nil {
                     fetchedUser?["ratings"] = 0 as CKRecordValue?
@@ -243,8 +216,11 @@ extension Redux {
                     fetchedUser?["score"] = 0.5 as CKRecordValue?
                 }
                 
-                let weight = exp(((instance.state.currentUser?["score"] as! Double) - (fetchedUser?["score"] as! Double)) * 5) / 1000
-                fetchedUser?["score"] = (instance.state.currentUser?["score"] as! Double) * (1 - weight) + (Double(rating) / 5.0 * weight) as CKRecordValue?
+                fetchedUser?["score"] = getNewScore(
+                    raterScore: instance.state.currentUser?["score"] as! Double,
+                    rateeScore: fetchedUser?["score"] as! Double,
+                    rating: Double(rating)
+                ) as CKRecordValue?
                 fetchedUser?["ratings"] = fetchedUser?["ratings"] as! Int + 1 as CKRecordValue?
                 
                 let operations = CKModifyRecordsOperation(recordsToSave: [ratingRecord, fetchedUser!], recordIDsToDelete: nil)

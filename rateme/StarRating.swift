@@ -38,6 +38,7 @@ class StarRating: UIStackView {
             button.circleColor = UIColor(red:0.36, green:0.21, blue:0.44, alpha:1.0)
             button.lineColor = UIColor(red:0.36, green:0.21, blue:0.44, alpha:1.0)
             button.backgroundColor = UIColor.clear
+            button.heightAnchor.constraint(equalToConstant: CGFloat(buttonSize)).isActive = true
             button.addTarget(self, action: #selector(ratingButtonTapped(button:)), for: .touchDown)
             ratingButtons.append(button)
             addArrangedSubview(button)

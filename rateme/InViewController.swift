@@ -10,12 +10,14 @@ import UIKit
 import AVFoundation
 
 let headerHeigh: CGFloat = 300.0
+private let smallRange = NSRange(location: 3, length: 2)
+private let bigRange = NSRange(location: 0, length: 3)
+private let smallFont = UIFont.systemFont(ofSize: 60, weight: UIFont.Weight.thin)
+private let bigFont = UIFont.systemFont(ofSize: 120, weight: UIFont.Weight.thin)
 
 class InViewController: UITableViewController, Subscriber {
     var identifier = Redux.generateIdentifier()
     var users: [BLEUser] = []
-    let smallFont = UIFont.systemFont(ofSize: 60, weight: UIFont.Weight.thin)
-    let bigFont = UIFont.systemFont(ofSize: 120, weight: UIFont.Weight.thin)
     let numberFormater = NumberFormatter()
     
     var swooshSound = NSURL(fileURLWithPath: Bundle.main.path(forResource: "swoosh", ofType: "mp3")!)
@@ -40,9 +42,11 @@ class InViewController: UITableViewController, Subscriber {
         page.actionHandler = { (item: ActionBulletinItem) in
             if page.starRating.rating > 0 {
                 Redux.rate(iCloudId: (page.userToRate?.iCloudID!)!, rating: page.starRating.rating)
-                self.audioPlayer.play()
-                self.navigationController?.popViewController(animated: true)
-                item.manager?.dismissBulletin()
+                DispatchQueue.main.async {
+                    self.audioPlayer.play()
+                    self.navigationController?.popViewController(animated: true)
+                    item.manager?.dismissBulletin()
+                }
             } else {
                 // TODO shake
             }
@@ -92,17 +96,15 @@ class InViewController: UITableViewController, Subscriber {
 
     func update(state: State, previousState: State) {
         self.users = state.nearbyUsers.filter({user in
-            print(user.record ?? "")
+            print(user.record?.recordID ?? "")
             return user.record != nil
         })
 
         if (state.currentUser?["score"]) != nil {
             DispatchQueue.main.async {
                 let score = NSMutableAttributedString(string: self.numberFormater.string(from: NSNumber(value: state.currentUser?["score"] as! Double * 5.0))!)
-                let bigRange = NSRange(location: 0, length: 3)
-                score.addAttribute(NSAttributedStringKey.font, value: self.bigFont, range: bigRange)
-                let smallRange = NSRange(location: 3, length: 2)
-                score.addAttribute(NSAttributedStringKey.font, value: self.smallFont, range: smallRange)
+                score.addAttribute(NSAttributedStringKey.font, value: bigFont, range: bigRange)
+                score.addAttribute(NSAttributedStringKey.font, value: smallFont, range: smallRange)
                 self.scoreLabel.attributedText = score
                 self.tableView.reloadData()
                 self.waveHeader.updateWhenScrolling(tableView: self.tableView)
@@ -138,7 +140,6 @@ class InViewController: UITableViewController, Subscriber {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         (bulletinManager.currentItem as! RateBulletinItem).userToRate = self.users[indexPath.row]
-        bulletinManager.refreshCurrentItemInterface()
         bulletinManager.presentBulletin(above: self)
     }
 

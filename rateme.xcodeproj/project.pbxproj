@@ -60,6 +60,7 @@
 		03AE5B241DE3347700B64A76 /* swoosh.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 03AE5B1C1DE3347700B64A76 /* swoosh.mp3 */; };
 		03E527D41FFFC7B4006BB7DF /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E527D31FFFC7B4006BB7DF /* Colors.swift */; };
 		03E527D61FFFC946006BB7DF /* ChooseAvatarBulletinItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E527D51FFFC946006BB7DF /* ChooseAvatarBulletinItem.swift */; };
+		03E527D82000CBD7006BB7DF /* RatingAlgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E527D72000CBD7006BB7DF /* RatingAlgo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -140,6 +141,7 @@
 		03AE5B1C1DE3347700B64A76 /* swoosh.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = swoosh.mp3; sourceTree = "<group>"; };
 		03E527D31FFFC7B4006BB7DF /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		03E527D51FFFC946006BB7DF /* ChooseAvatarBulletinItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseAvatarBulletinItem.swift; sourceTree = "<group>"; };
+		03E527D72000CBD7006BB7DF /* RatingAlgo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingAlgo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -265,6 +267,7 @@
 				03AE5B141DE3346800B64A76 /* sounds */,
 				032003391DD7A881006B536C /* BLEUser.swift */,
 				032003371DD79F5C006B536C /* Discovery.swift */,
+				03E527D72000CBD7006BB7DF /* RatingAlgo.swift */,
 				03E527D31FFFC7B4006BB7DF /* Colors.swift */,
 				036619FD1DD8DDBA00038FEF /* views */,
 				0308A4141DD6287E00D74A1D /* Assets.xcassets */,
@@ -621,6 +624,7 @@
 				0302606A1FFF8A0E006034FC /* BulletinInterfaceBuilder.swift in Sources */,
 				0320032F1DD73858006B536C /* ICouldUnavailableViewController.swift in Sources */,
 				030260801FFF8A55006034FC /* BulletinPresentationAnimationController.swift in Sources */,
+				03E527D82000CBD7006BB7DF /* RatingAlgo.swift in Sources */,
 				032003311DD73CB5006B536C /* SignupViewController.swift in Sources */,
 				03252FBA1FFD0D540028A95D /* State.swift in Sources */,
 				0308A40D1DD6287E00D74A1D /* RootController.swift in Sources */,

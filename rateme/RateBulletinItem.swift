@@ -15,7 +15,7 @@ import UIKit
     
     var userToRate: BLEUser? {
         didSet {
-            title = "Rate" + (userToRate?.record?["username"] as? String ?? "")
+            title = "Rate " + (userToRate?.record?["username"] as? String ?? "")
         }
     }
     
