@@ -224,7 +224,7 @@ extension Redux {
                 fetchedUser?["ratings"] = fetchedUser?["ratings"] as! Int + 1 as CKRecordValue?
                 
                 let index = instance.state.nearbyUsers.index(where: {closeUser in
-                    return closeUser.iCloudID == iCloudID
+                    return closeUser.iCloudID == iCloudId
                 })
                 if index != nil {
                     instance.state.nearbyUsers[index!].record = fetchedUser
