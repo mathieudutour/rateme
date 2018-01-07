@@ -96,7 +96,6 @@ class InViewController: UITableViewController, Subscriber {
 
     func update(state: State, previousState: State) {
         self.users = state.nearbyUsers.filter({user in
-            print(user.record?.recordID ?? "")
             return user.record != nil
         })
 
@@ -118,7 +117,7 @@ class InViewController: UITableViewController, Subscriber {
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         if self.users.count > 0 {
-            tableView.separatorStyle = .singleLine
+            tableView.separatorStyle = .none
             tableView.backgroundView = nil
             return 1
         }
@@ -148,7 +147,7 @@ class InViewController: UITableViewController, Subscriber {
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableViewAutomaticDimension
+        return 67
     }
 
     override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {

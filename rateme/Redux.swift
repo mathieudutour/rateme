@@ -18,8 +18,6 @@ class Redux {
     private var subscribers: Array<Subscriber> = []
     var discovery: Discovery?
 
-    let publicDB = CKContainer.default().publicCloudDatabase
-
     var previousState = State()
     var state = State()
 

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CloudKit
 
 private let smallRange = NSRange(location: 3, length: 2)
 private let bigRange = NSRange(location: 0, length: 3)
@@ -18,7 +19,9 @@ class CloseUserCell: UITableViewCell {
 
     @IBOutlet weak var username: UILabel!
     @IBOutlet weak var score: UILabel!
-
+    @IBOutlet weak var avatar: UIImageView!
+    @IBOutlet weak var wrapper: UIView!
+    
     var user: BLEUser? {
         didSet {
             setUsernameAndScore()
@@ -33,6 +36,18 @@ class CloseUserCell: UITableViewCell {
         numberFormater.minimumFractionDigits = 3
         numberFormater.roundingMode = .halfUp
     }
+    
+    override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        
+        avatar.contentMode = .scaleAspectFill
+        avatar.layer.cornerRadius = 19.5
+        avatar.layer.borderColor = UIColor.white.cgColor
+        avatar.layer.borderWidth = 1.0
+        avatar.clipsToBounds = true
+        
+        wrapper.layer.cornerRadius = 12
+    }
 
     func setUsernameAndScore() {
         if username != nil {
@@ -41,6 +56,17 @@ class CloseUserCell: UITableViewCell {
                 let score = NSMutableAttributedString(string: self.numberFormater.string(from: NSNumber(value: user?.record?["score"] as! Double * 5.0))!)
                 score.addAttribute(NSAttributedStringKey.font, value: bigFont, range: bigRange)
                 score.addAttribute(NSAttributedStringKey.font, value: smallFont, range: smallRange)
+                let avatarAsset = user?.record?["avatar"] as! CKAsset?
+                if (avatarAsset != nil) {
+                    guard let imageData = NSData(contentsOf: avatarAsset!.fileURL) else {
+                        print("Invalid Image")
+                        return
+                    }
+                    self.avatar.image = UIImage(data: imageData as Data)
+                } else {
+                    self.avatar.image = nil
+                }
+                
                 self.score.attributedText = score
             } else {
                 self.username.text = "username"

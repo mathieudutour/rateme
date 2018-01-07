@@ -17,7 +17,7 @@ func starsToScore(_ stars: Int) -> Double {
  * @param rateeScore - the score of the person being rated, between 0 and 1
  * @param rating - note between 1 and 5
  */
-func getNewScore(raterScore: Double, rateeScore: Double, rating: Double) -> Double {
+func getNewScore(raterScore: Double, rateeScore: Double, rating: Int) -> Double {
     let weight = exp((raterScore - rateeScore) * 5) / 1000
     return (
         rateeScore * (1 - weight)

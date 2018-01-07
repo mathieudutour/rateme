@@ -119,28 +119,30 @@ class Discovery: NSObject {
         // fetch the users for which we don't have the record
         for key in self.usersMap.keys {
             let bleUser = self.usersMap[key]!
-            if (bleUser.iCloudID != nil && bleUser.record == nil && !bleUser.fetchingRecord) {
+            if (bleUser.iCloudID == nil) {
+                // if we don't have an iCloudID, connect to by bluetooth and get it
+                if bleUser.peripheral.state == CBPeripheralState.disconnected {
+                    print("connecting to the peripheral", bleUser.peripheral.identifier)
+                    self.centralManager?.connect(bleUser.peripheral, options:nil)
+                }
+            } else if (bleUser.iCloudID != nil && bleUser.record == nil && !bleUser.fetchingRecord) {
+                // if we don't have an record, fetch it from the db
                 bleUser.fetchingRecord = true
                 
                 let recordId = CKRecordID(recordName: bleUser.iCloudID! as String)
-                
-                let fetchingUser = CKFetchRecordsOperation.init(recordIDs: [recordId])
-                fetchingUser.qualityOfService = .userInitiated
-                fetchingUser.database = self.publicDB
-                
-                fetchingUser.fetchRecordsCompletionBlock = { fetchedUsers, error in
+                fetchUser(recordId: recordId, {fetchedUser, error in
                     bleUser.fetchingRecord = false
                     if error != nil {
-                        print(error!.localizedDescription)
-                        return
+                        print("failed to fetch user", error!)
+                        
+                        // we probably didn't have a good icloudID so remove it and fetch it again by bluetooth
+                        bleUser.iCloudID = nil
+                        self.checkList()
+                    } else if (fetchedUser != nil) {
+                        bleUser.record = fetchedUser
+                        self.updateList()
                     }
-                    
-                    let fetchedUser = fetchedUsers![recordId]
-                    bleUser.record = fetchedUser
-                    self.updateList()
-                }
-                fetchingUser.start()
-                
+                })
             }
         }
         
@@ -153,6 +155,7 @@ class Discovery: NSObject {
         var users = Array(self.usersMap.values).filter({user in
             if (user.record != nil && user.iCloudID != nil && iCloudIds[user.iCloudID!] == nil) {
                 iCloudIds[user.iCloudID!] = true
+                print(user.record!)
                 return true
             }
             return false
@@ -170,39 +173,40 @@ class Discovery: NSObject {
 
 extension Discovery: CBCentralManagerDelegate {
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        print("User is discovered: ", peripheral.name ?? "unknown", peripheral.identifier, RSSI)
-        
-        let iCloudID = advertisementData[CBAdvertisementDataLocalNameKey]
-        
+                
         var bleUser = self.usersMap[peripheral.identifier.uuidString]
         if bleUser == nil {
+            print("User is discovered: ", peripheral.identifier)
             self.usersMap[peripheral.identifier.uuidString] = BLEUser(peripheral: peripheral)
             bleUser = self.usersMap[peripheral.identifier.uuidString]
             bleUser!.peripheral.delegate = self
+        }
+        
+        let potentialICloudID = advertisementData[CBAdvertisementDataLocalNameKey]
+        
+        if (bleUser!.iCloudID == nil && potentialICloudID != nil) {
+            bleUser!.iCloudID = potentialICloudID as! String?
         }
         
         // update the rss and update time
         bleUser!.setRssi(rssi: RSSI.floatValue)
         bleUser!.updateTime = NSDate().timeIntervalSince1970
         
-        if bleUser!.iCloudID == nil {
-            // We check if we can get the username from the advertisement data,
-            // in case the advertising peer application is working at foreground
-            // if we get the name from advertisement we don't have to establish a peripheral connection
-            if iCloudID != nil && (iCloudID as! String).count > 0 {
-                bleUser!.iCloudID = iCloudID as! String?
-                
-                // we update our list for callback block
-                self.updateList()
-            } else {
-                // nope we could not get the username from CBAdvertisementDataLocalNameKey,
-                // we have to connect to the peripheral and try to get the characteristic data
-                // add we will extract the username from characteristics.
-                
-                if peripheral.state == CBPeripheralState.disconnected {
-                    self.centralManager?.connect(peripheral, options:nil)
-                }
-            }
+        // we update our list for callback block
+        self.checkList()
+    }
+    
+    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        print("Peripheral failed to connect: ", peripheral.identifier)
+        if (error != nil) {
+            print("failed to connect peripheral", error!)
+        }
+    }
+    
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        print("Peripheral disconnected: ", peripheral.identifier)
+        if (error != nil) {
+            print(error!)
         }
     }
     
@@ -269,7 +273,7 @@ extension Discovery: CBPeripheralManagerDelegate {
 extension Discovery: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         if (error != nil) {
-            print(error!)
+            print("failed to discover services", error!)
             return
         }
         // loop the services
@@ -281,7 +285,7 @@ extension Discovery: CBPeripheralDelegate {
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         if (error != nil) {
-            print(error!)
+            print("failed to discover characteristic", error!)
             return
         }
         // loop through to find our characteristic
@@ -294,7 +298,7 @@ extension Discovery: CBPeripheralDelegate {
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         if (error != nil) {
-            print(error!)
+            print("failed to update value for characteristic", error!)
             return
         }
         let valueStr = NSString(data: characteristic.value!, encoding:String.Encoding.utf8.rawValue)

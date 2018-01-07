@@ -11,6 +11,20 @@ import CloudKit
 
 let RATING = "Rating"
 
+let publicDB = CKContainer.default().publicCloudDatabase
+func fetchUser(recordId: CKRecordID, _ complete: @escaping (_ instance: CKRecord?, _ error: Error?) -> ()) {
+    // starting to fetch the current user
+    let fetchingCurrentUser = CKFetchRecordsOperation.init(recordIDs: [recordId])
+    fetchingCurrentUser.qualityOfService = .userInteractive
+    fetchingCurrentUser.database = publicDB
+    
+    fetchingCurrentUser.fetchRecordsCompletionBlock = { fetchedUsers, error in
+        let fetchedUser = fetchedUsers![recordId]
+        complete(fetchedUser, error)
+    }
+    fetchingCurrentUser.start()
+}
+
 // MARK: - initial state
 extension Redux {
     func initialState() {
@@ -21,14 +35,21 @@ extension Redux {
             self.state.recordId = CKRecordID(recordName: userID)
             
             // starting to fetch the current user
-            self.fetchUser(recordId: self.state.recordId!, complete: { fetchedUser in
-                if fetchedUser["username"] == nil {
+            fetchUser(recordId: self.state.recordId!, { fetchedUser, error in
+                if error != nil {
+                    print("failed to fetch user", error!.localizedDescription)
+                    self.state.loading = false
+                    self.state.icloudUnavailable = true
+                    self.dispatch()
+                    return
+                }
+                if fetchedUser?["username"] == nil {
                     self.state.tempRecord = fetchedUser
                     self.state.needToSignup = true
                     self.state.loading = false
                     self.dispatch()
                 } else {
-                    self.login(recordId: self.state.recordId!, record: fetchedUser)
+                    self.login(recordId: self.state.recordId!, record: fetchedUser!)
                 }
             })
         }
@@ -48,28 +69,6 @@ extension Redux {
                 complete(recordID!)
             }
         }
-    }
-    
-    // get
-    private func fetchUser(recordId: CKRecordID, complete: @escaping (_ instance: CKRecord) -> ()) {
-        // starting to fetch the current user
-        let fetchingCurrentUser = CKFetchRecordsOperation.init(recordIDs: [recordId])
-        fetchingCurrentUser.qualityOfService = .userInteractive
-        fetchingCurrentUser.database = self.publicDB
-        
-        fetchingCurrentUser.fetchRecordsCompletionBlock = { fetchedUsers, error in
-            if error != nil {
-                print(error!.localizedDescription)
-                self.state.loading = false
-                self.state.icloudUnavailable = true
-                self.dispatch()
-                return
-            }
-            
-            let fetchedUser = fetchedUsers![self.state.recordId!]
-            complete(fetchedUser!)
-        }
-        fetchingCurrentUser.start()
     }
     
     private func startDiscovery() {
@@ -146,7 +145,7 @@ extension Redux {
                 complete()
             }
         
-            instance.publicDB.add(operation)
+            publicDB.add(operation)
         }
     }
 }
@@ -176,7 +175,7 @@ extension Redux {
                         self.state.currentUser?["username"] = username as CKRecordValue?
                         self.dispatch()
                     }
-                    self.publicDB.save(self.state.currentUser!) { savedUser, savedError in
+                    publicDB.save(self.state.currentUser!) { savedUser, savedError in
                         
                     }
                 }
@@ -196,14 +195,14 @@ extension Redux {
             predicate: NSPredicate(format: "rater == %@ AND ratee == %@ AND creationDate > %@", rater, ratee, NSDate().addingTimeInterval(-24 * 60 * 60))
         )
         
-        instance.publicDB.perform(query, inZoneWith: nil) { (last24hRatings, error) in
+        publicDB.perform(query, inZoneWith: nil) { (last24hRatings, error) in
             if (last24hRatings != nil && (last24hRatings?.count)! > 0) {
                 print("already rated")
                 return
             }
-            instance.publicDB.fetch(withRecordID: CKRecordID(recordName: iCloudId)) { fetchedUser, error in
+            publicDB.fetch(withRecordID: CKRecordID(recordName: iCloudId)) { fetchedUser, error in
                 if (error != nil) {
-                    print(error!)
+                    print("failed to fetch ratee", error!)
                     return
                 }
                 let ratingRecord = CKRecord(recordType: "Rating")
@@ -221,7 +220,7 @@ extension Redux {
                 fetchedUser?["score"] = getNewScore(
                     raterScore: instance.state.currentUser?["score"] as! Double,
                     rateeScore: fetchedUser?["score"] as! Double,
-                    rating: Double(rating)
+                    rating: rating
                 ) as CKRecordValue?
                 fetchedUser?["ratings"] = fetchedUser?["ratings"] as! Int + 1 as CKRecordValue?
                 
@@ -239,7 +238,7 @@ extension Redux {
                     instance.dispatch()
                 }
                 
-                instance.publicDB.add(operations)
+                publicDB.add(operations)
             }
         }
     }
